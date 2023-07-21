@@ -1,8 +1,8 @@
 import React from 'react';
 import { useState, useEffect } from 'react'
 
-import axios from 'axios';
-
+//import axios from 'axios';
+import personService from './services/persons'
 
 const Persons = ({ persons, newFilter }) => {
 
@@ -71,33 +71,32 @@ const App = () => {
     setFilter(event.target.value)
   }
 
-
-  const hook = () => {
-  //  console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-    //    console.log('promise fulfilled')
-        setPersons(response.data)
+  useEffect(() => {
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
-  }
+  }, [])
 
-  useEffect(hook, [])
- // console.log('render', persons.length, 'persons')
-
-
-
-
- 
-const addPerson =(event) => {
+  const addPerson = (event) => {
     event.preventDefault()
 
-    const newPersonData = { name: newName, number: newNumber,}
-     const found = persons.find(element => element.name === newName)
-  
-     found === undefined
-       ? setPersons(persons.concat(newPersonData)) + setName('') + setNumber('')
-       : alert(`${newName} is already added to phonebook`)
+    const newPersonData = { name: newName, number: newNumber, }
+    const found = persons.find(element => element.name === newName)
+
+    found === undefined
+
+      ?
+      personService
+        .create(newPersonData)
+        .then(returnedPersons => {
+          setPersons(persons.concat(returnedPersons))
+          setName('')
+          setNumber('')
+        })
+
+      : alert(`${newName} is already added to phonebook`)
 
   }
   return (
