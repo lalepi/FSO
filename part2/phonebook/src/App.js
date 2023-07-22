@@ -1,21 +1,27 @@
 import React from 'react';
 import { useState, useEffect } from 'react'
-
-//import axios from 'axios';
 import personService from './services/persons'
 
-const Persons = ({ persons, newFilter }) => {
+const Person = ({ person, removePerson}) => (
+  <div>
+    {person.name} {person.number}{" "}
+    <button onClick={() => removePerson(person.id)}> Delete</button>
+  </div>
+)
 
-  const filteredPersons = persons.filter(x => x.name.toLowerCase().includes(newFilter.toLowerCase()))
-
+const Persons = ({ persons, removePerson}) => {
+ 
   return (
-    filteredPersons.map((person) => (
-
-      <div key={person.name}>
-        {person.name} {person.number}{''}
-
-      </div>
-    )));
+    <div>
+    {persons.map(person =>
+      <Person
+      key={person.id}
+      person={person}
+      removePerson={removePerson}
+     />
+    )}
+    </div>
+  )
 }
 
 const Filter = ({ newFilter, handleFilterChange }) => (
@@ -79,6 +85,11 @@ const App = () => {
       })
   }, [])
 
+
+  const filteredPersons = 
+  Filter === '' ? persons : persons.filter(x => x.name.toLowerCase().includes(newFilter.toLowerCase()))
+
+
   const addPerson = (event) => {
     event.preventDefault()
 
@@ -97,8 +108,29 @@ const App = () => {
         })
 
       : alert(`${newName} is already added to phonebook`)
-
   }
+
+
+const removePerson = (id) => {
+  
+const person = persons.find(n => n.id === id)
+console.log(person)
+const confirmRemove = window.confirm (`Delete ${person.name}`)
+
+confirmRemove === true
+
+?personService
+  .remove(id)
+  .then(
+  setPersons(
+    persons.filter((person) => {
+       return person.id !== id;
+    }))
+  )
+  :null
+
+}
+  
   return (
     <div>
       <h2>Phonebook</h2>
@@ -116,9 +148,11 @@ const App = () => {
       <h3>Numbers</h3>
 
       <Persons
-        persons={persons}
-        newFilter={newFilter} />
+        persons={filteredPersons}
+        removePerson={removePerson}
+        />
     </div>
+    
   )
 
 }
