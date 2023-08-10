@@ -6,11 +6,12 @@ import axios from 'axios'
 const CountryNames = ({ countryName}) => (
 
   <div>
+     {console.log("inside countryNames", countryName)}
     {countryName.name.common}
   </div>
 )
 
-const Countrydata = ({ filteredItems, singleCountry}) => {
+const Countrydata = ({ filteredItems, allCountries}) => {
 
 if(filteredItems.length > 10){
     return (
@@ -33,27 +34,42 @@ if(filteredItems.length < 10 && filteredItems.length > 1) {
     </div>
   )
 }
+if(filteredItems.length === 1){
 
-return (
-  <pre>
-  
-</pre>
-)
-      
+
+console.log("filteredItems", filteredItems[0].languages)
+
+const languages =  filteredItems.map(language => (
+    Object.values(language.languages)
+  ))
+
+
+    return (
+      <div>
+        {filteredItems[0].name.common}
+        {filteredItems[0].capital[0]}
+        languages:
+        <ul>
+  {languages}
+        </ul>
+        {filteredItems[0].flag}
+      </div>
+    )
+  }
 }
 
 const App = () => {
   const [value, setValue] = useState('')
   const [country, setCountry] = useState('')
-  const [allCountries, setAllCountries] = useState({})
-  const [singleCountry, setSingleCountry] = useState([])
+  const [allCountries, setAllCountries] = useState([])
+  const [singleCountry, setSingleCountry] = useState({})
 
 
   const filteredItems = country === '' ? country :allCountries.filter(item => `${item.name.common.toLowerCase()}`.includes(country.toLowerCase()));
 
   const onlyOne = filteredItems.length === 1
 
-  console.log(filteredItems)
+ 
 
   useEffect(() => {
 
