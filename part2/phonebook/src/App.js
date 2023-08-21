@@ -1,64 +1,11 @@
 import React from 'react';
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
-
-const Person = ({ person, removePerson }) => (
-  <div>
-    {person.name} {person.number}{" "}
-    <button onClick={() => removePerson(person.id)}> Delete</button>
-  </div>
-)
-
-const Persons = ({ persons, removePerson }) => {
-
-  return (
-    <div>
-      {persons.map(person =>
-        <Person
-          key={person.id}
-          person={person}
-          removePerson={removePerson}
-        />
-      )}
-    </div>
-  )
-}
-
-const Filter = ({ newFilter, handleFilterChange }) => (
-
-  <div>
-    filter shown with: <input
-      value={newFilter}
-      onChange={handleFilterChange}
-    />
-  </div>
-)
-
-const PersonForm = ({
-  onSubmit,
-  newName,
-  newNumber,
-  handleNameChange,
-  handleNumberChange }) => (
-
-  <form onSubmit={onSubmit} >
-    <div>
-      name: <input
-        value={newName}
-        onChange={handleNameChange}
-      />
-    </div>
-    <div>
-      number: <input
-        value={newNumber}
-        onChange={handleNumberChange}
-      />
-    </div>
-    <div>
-      <button type="submit">add</button>
-    </div>
-  </form>
-);
+import Person from './components/Person'
+import Persons from './components/Persons'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Notification from './components/Notification'
 
 const App = () => {
 
@@ -66,6 +13,7 @@ const App = () => {
   const [newName, setName] = useState('')
   const [newNumber, setNumber] = useState('')
   const [newFilter, setFilter] = useState('')
+  const [Message, setMessage] = useState('')
 
   const handleNameChange = (event) => {
     setName(event.target.value)
@@ -91,9 +39,7 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-
     const newPersonData = { name: newName, number: newNumber }
-
     const found = persons.find(element => element.name === newName)
     const updateData = { ...found, name: newName, number: newNumber }
 
@@ -104,8 +50,13 @@ const App = () => {
           setPersons(persons.concat(returnedPersons))
           setName('')
           setNumber('')
+
+          setMessage(`User '${newName}' was added to phonebook`)
+          setTimeout(() => {setMessage(null)}, 5000)
+         
         })
 
+        
     else
 
       if (window.confirm((`${newName} is already added to phonebook, replace the old number with new one? `)) === true)
@@ -116,6 +67,13 @@ const App = () => {
             setPersons(persons.map(person => person.id !== found.id ? person : returnedPersons))
             setName('')
             setNumber('')
+            setMessage(`User '${found.name}' number has been changed from ${found.number} to ${updateData.number}`),
+            setTimeout(() => {setMessage(null)}, 5000)
+          })
+
+          .catch(error => {
+            setMessage(`Information of '${found.name}' has already been removed from server`)
+            setTimeout(() => {setMessage(null)}, 5000)
           })
   }
 
@@ -129,15 +87,17 @@ const App = () => {
         .remove(id)
         .then(
           setPersons(
-            persons.filter((person) => {
-              return person.id !== id;
-            }))
+            persons.filter((person) => { return person.id !== id;})),
+            setMessage(`User '${person.name}' has been removed`),
+            setTimeout(() => { setMessage(null)}, 5000)
         )
+
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={Message} />
       <Filter newFilter={newFilter} handleFilterChange={handleFilterChange} />
 
       <h3>add a new</h3>
