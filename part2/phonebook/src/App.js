@@ -52,11 +52,15 @@ const App = () => {
           setNumber('')
 
           setMessage(`User '${newName}' was added to phonebook`)
-          setTimeout(() => {setMessage(null)}, 5000)
-         
+          setTimeout(() => { setMessage(null) }, 5000)
+
+        })
+        .catch(error => {
+          setMessage(` ${error.response.data.error}`)
+          setTimeout(() => { setMessage(null) }, 5000)
+
         })
 
-        
     else
 
       if (window.confirm((`${newName} is already added to phonebook, replace the old number with new one? `)) === true)
@@ -68,12 +72,12 @@ const App = () => {
             setName('')
             setNumber('')
             setMessage(`User '${found.name}' number has been changed from ${found.number} to ${updateData.number}`),
-            setTimeout(() => {setMessage(null)}, 5000)
+              setTimeout(() => { setMessage(null) }, 5000)
           })
 
           .catch(error => {
             setMessage(`Information of '${found.name}' has already been removed from server`)
-            setTimeout(() => {setMessage(null)}, 5000)
+            setTimeout(() => { setMessage(null) }, 5000)
           })
   }
 
@@ -87,9 +91,9 @@ const App = () => {
         .remove(id)
         .then(
           setPersons(
-            persons.filter((person) => { return person.id !== id;})),
-            setMessage(`User '${person.name}' has been removed`),
-            setTimeout(() => { setMessage(null)}, 5000)
+            persons.filter((person) => { return person.id !== id; })),
+          setMessage(`User '${person.name}' has been removed`),
+          setTimeout(() => { setMessage(null) }, 5000)
         )
 
   }
