@@ -74,10 +74,10 @@ const App = () => {
             setMessage(`User '${found.name}' number has been changed from ${found.number} to ${updateData.number}`),
               setTimeout(() => { setMessage(null) }, 5000)
           })
-
           .catch(error => {
-            setMessage(`Information of '${found.name}' has already been removed from server`)
+            setMessage(` ${error.response.data.error}`)
             setTimeout(() => { setMessage(null) }, 5000)
+
           })
   }
 
