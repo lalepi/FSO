@@ -1,7 +1,6 @@
-import React from 'react';
+import React from 'react'
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
-import Person from './components/Person'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
@@ -71,8 +70,8 @@ const App = () => {
             setPersons(persons.map(person => person.id !== found.id ? person : returnedPersons))
             setName('')
             setNumber('')
-            setMessage(`User '${found.name}' number has been changed from ${found.number} to ${updateData.number}`),
-              setTimeout(() => { setMessage(null) }, 5000)
+            setMessage(`User '${found.name}' number has been changed from ${found.number} to ${updateData.number}`)
+            setTimeout(() => { setMessage(null) }, 5000)
           })
           .catch(error => {
             setMessage(` ${error.response.data.error}`)
@@ -91,7 +90,7 @@ const App = () => {
         .remove(id)
         .then(
           setPersons(
-            persons.filter((person) => { return person.id !== id; })),
+            persons.filter((person) => { return person.id !== id })),
           setMessage(`User '${person.name}' has been removed`),
           setTimeout(() => { setMessage(null) }, 5000)
         )

@@ -1,13 +1,13 @@
-import React from 'react';
+import React from 'react'
 
 const Filter = ({ newFilter, handleFilterChange }) => (
 
-    <div>
+  <div>
       filter shown with: <input
-        value={newFilter}
-        onChange={handleFilterChange}
-      />
-    </div>
-  )
+      value={newFilter}
+      onChange={handleFilterChange}
+    />
+  </div>
+)
 
 export default Filter
