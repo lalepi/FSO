@@ -1,7 +1,6 @@
 const _ = require('lodash')
 
-const dummy = (blogs) => {
-    console.log(blogs)
+const dummy = () => {
     return 1
 }
 
@@ -19,8 +18,6 @@ const favoriteBlog = (blogs) => {
         author: favorite.author,
         likes: favorite.likes
     }
-    console.log(mostLiked)
-
     return (mostLiked)
 
 }
