@@ -99,6 +99,55 @@ test('blog has no title, url field', async () => {
     })
 })
 
+describe('deletion of a blog', () => {
+    test('succeeds with status code 204 if id is valid', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+        const blogToDelete = blogsAtStart[0]
+
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
+
+        const blogsAtEnd = await helper.blogsInDb()
+
+        expect(blogsAtEnd).toHaveLength(
+            helper.allBlogs.length - 1
+        )
+
+        const contents = blogsAtEnd.map(r => r.title)
+
+        expect(contents).not.toContain(blogToDelete.title)
+        expect(contents).not.toContain(blogToDelete.author)
+        expect(contents).not.toContain(blogToDelete.url)
+        expect(contents).not.toContain(blogToDelete.likes)
+
+    })
+})
+
+test('modifying a blog', async () => {
+
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToModify = blogsAtStart[0]
+
+    const modBlog = {
+        title: 'React patterns modified',
+        author: 'Michael Chan',
+        url: 'https://reactpatterns.com/',
+        likes: 7,
+    }
+
+    await api
+        .put(`/api/blogs/${blogToModify.id}`)
+        .send(modBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const titles = await helper.blogsInDb().map(n => n.title)
+    expect(titles).toContain('React patterns modified')
+
+})
+
+
 afterAll(async () => {
     await mongoose.connection.close()
 })
