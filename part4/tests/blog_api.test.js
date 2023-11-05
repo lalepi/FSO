@@ -165,15 +165,15 @@ describe('when there is initially one user at db', () => {
     test('creation succeeds with a fresh username', async () => {
         const usersAtStart = await helper.usersInDb()
 
-        const newUser = {
-            username: 'mluukkai',
+        const newestUser = {
+            username: 'mluukkailainen',
             name: 'Matti Luukkainen',
             password: 'salainen',
         }
 
         await api
             .post('/api/users')
-            .send(newUser)
+            .send(newestUser)
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
@@ -181,7 +181,7 @@ describe('when there is initially one user at db', () => {
         expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
         const usernames = usersAtEnd.map(u => u.username)
-        expect(usernames).toContain(newUser.username)
+        expect(usernames).toContain(newestUser.username)
     })
 
     test('creation fails with proper statuscode and message if username already taken', async () => {
@@ -237,14 +237,11 @@ describe('when there is initially one user at db', () => {
             .expect(400)
             .expect('Content-Type', /application\/json/)
 
-        expect(result.body.error).toContain('is shorter than the minimum allowed length')
+        expect(result.body.error).toContain('Password is too short')
 
     })
 
 })
-
-
-
 
 afterAll(async () => {
     await mongoose.connection.close()
