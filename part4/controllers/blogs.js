@@ -23,11 +23,6 @@ blogsRouter.get('/:id', async (request, response) => {
 blogsRouter.post('/', userExtractor, async (request, response) => {
     const body = request.body
 
-    // const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    // if (!decodedToken.id) {
-    //     return response.status(401).json({ error: 'token invalid' })
-    // }
-
     const user = request.user
 
     const blog = new Blog({
@@ -39,14 +34,20 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
         likes: body.likes,
     })
 
-    if (blog.title === undefined || blog.url === undefined) {
-        response.status(400).json(blog)
-    } else {
+    if (blog.title && blog.url) {
 
+        console.log(request.token)
+        if (!request.token) {
+            response.status(401).json({ error: 'invalid token' })
+        }
         const savedBlog = await blog.save()
         user.blogs = user.blogs.concat(savedBlog.id)
         await user.save()
         response.status(201).json(savedBlog)
+
+    } else {
+
+        response.status(400).json(blog)
     }
 })
 

@@ -8,11 +8,32 @@ const Blog = require('../models/blog')
 const bcrypt = require('bcryptjs')
 const User = require('../models/user')
 
-
+let loggedInToken = ''
 
 beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.allBlogs)
+    await User.deleteMany({})
+
+    const saltRounds = 10
+
+    const passwordHash = await bcrypt.hash('secretpassword', saltRounds)
+
+    const user = new User({
+        username: 'testuser',
+        passwordHash
+    })
+    await user.save()
+
+
+    const response = await api
+        .post('/api/login')
+        .send({
+            username: 'testuser',
+            password: 'secretpassword'
+        })
+
+    loggedInToken = response.body.token
 })
 
 test('blogs are returned as json', async () => {
@@ -42,11 +63,12 @@ test('a blog can be added', async () => {
         title: 'Pet Cemetary',
         author: 'Stephen King',
         url: 'https://stephenking.com/',
-        likes: 7,
+        likes: 7
     }
 
     await api
         .post('/api/blogs')
+        .set({ Authorization: `bearer ${loggedInToken}` })
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -59,6 +81,28 @@ test('a blog can be added', async () => {
 
 })
 
+test('adding a blog without a token', async () => {
+
+    const newBlog = {
+        title: 'Pet Cemetary',
+        author: 'Stephen King',
+        url: 'https://stephenking.com/',
+        likes: 7
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+    const blogResponse = await api.get('/api/blogs')
+    blogResponse.body.forEach(blog => {
+        expect(blog.title).toBeTruthy()
+        expect(blog.url).toBeTruthy()
+    })
+})
+
 test('likes field has value or it default to 0', async () => {
 
     const newBlog = {
@@ -69,6 +113,7 @@ test('likes field has value or it default to 0', async () => {
     }
     await api
         .post('/api/blogs')
+        .set({ Authorization: `bearer ${loggedInToken}` })
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -78,8 +123,6 @@ test('likes field has value or it default to 0', async () => {
         expect(blog.likes).toBeGreaterThanOrEqual(0)
     })
 })
-
-
 
 test('blog has no title, url field', async () => {
 
@@ -92,6 +135,7 @@ test('blog has no title, url field', async () => {
     }
     await api
         .post('/api/blogs')
+        .set({ Authorization: `bearer ${loggedInToken}` })
         .send(newBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
@@ -104,18 +148,35 @@ test('blog has no title, url field', async () => {
 })
 
 describe('deletion of a blog', () => {
+
+    beforeEach(async () => {
+        await Blog.deleteMany({})
+        const user = await User.find({ username: 'testuser' })
+
+        const newBlog = new Blog({
+            title: 'Pet Cemetary',
+            author: 'Stephen King',
+            url: 'https://stephenking.com/',
+            likes: 7,
+            user: user[0]._id
+        })
+        await newBlog.save()
+
+    })
     test('succeeds with status code 204 if id is valid', async () => {
         const blogsAtStart = await helper.blogsInDb()
         const blogToDelete = blogsAtStart[0]
 
+
         await api
             .delete(`/api/blogs/${blogToDelete.id}`)
+            .set({ Authorization: `bearer ${loggedInToken}` })
             .expect(204)
 
         const blogsAtEnd = await helper.blogsInDb()
 
         expect(blogsAtEnd).toHaveLength(
-            helper.allBlogs.length - 1
+            blogsAtStart.length - 1
         )
 
         const contents = blogsAtEnd.map(r => r.title)

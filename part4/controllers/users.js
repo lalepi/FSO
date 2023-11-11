@@ -4,7 +4,6 @@ const User = require('../models/user')
 
 usersRouter.post('/', async (request, response) => {
     const { username, name, password } = request.body
-    console.log('request.body', request.body)
     if (password.length <= 3) {
         return response.status(400).json({ error: 'Password is too short, minimum length for password is 3' })
     }
