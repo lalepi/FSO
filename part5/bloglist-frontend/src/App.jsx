@@ -8,6 +8,7 @@ import BlogForm from './components/BlogForm'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
+  const [message, setMessage] = useState(null)
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
@@ -48,6 +49,10 @@ const addBlog = (event) => {
       setNewTitle('')
       setNewAuthor('')
       setNewUrl('')
+      setMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     })
 
 }
@@ -94,7 +99,7 @@ const handleLogin = async (event) => {
     setUsername('')
     setPassword('')
   } catch (exception) {
-    setErrorMessage('wrong credentials')
+    setErrorMessage('wrong username or password')
     setTimeout(() => {
       setErrorMessage(null)
     }, 5000)
@@ -128,9 +133,9 @@ const logoutUser = () => (
 
   return (
     <div>
-      <Notification message={errorMessage}/>
+      
       <h2>blogs</h2>
-     
+      <Notification message={message}/>
       {logoutUser()}
 
       <BlogForm 
