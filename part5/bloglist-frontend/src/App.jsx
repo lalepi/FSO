@@ -40,9 +40,6 @@ const addBlog = (blogObject) => {
     .create(blogObject)
     .then(returnedBlog => {
       setBlogs(blogs.concat(returnedBlog))
-      setNewTitle('')
-      setNewAuthor('')
-      setNewUrl('')
       setMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
       setTimeout(() => {
         setMessage(null)
@@ -51,6 +48,20 @@ const addBlog = (blogObject) => {
 
 }
 
+const toggleLike = id => {
+
+  const blog = blogs.find(n => n.id === id)
+  const like = blog.likes + 1
+  const changedBlog = { ...blog, likes: like }
+
+  blogService
+  .update(id,changedBlog)
+  .then(returnedBlog => {
+    setBlogs.blogs.map(blog => blog.id !== id ? blog : returnedBlog)
+  })
+
+
+}
 
 const loginForm = () => (
   <form onSubmit={handleLogin}>
@@ -126,10 +137,22 @@ const logoutUser = () => (
   }
 
   const blogForm = () => (
-    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+    <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
       <BlogForm createBlog={addBlog}/>
     </Togglable>
       )
+
+  const allBlogs = () => (
+    <div>
+      {blogs.map(blog =>
+        <Blog 
+        key={blog.id} 
+        blog={blog}
+        toggleLike={() => toggleLike(blog.id)}
+        />
+      )}
+    </div>
+  )
 
   return (
     <div>
@@ -138,11 +161,8 @@ const logoutUser = () => (
       <Notification message={message}/>
       {logoutUser()}
       {blogForm()}
-
-
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog}/>
-      )}
+      {allBlogs()}
+    
     </div>
   )
 }
