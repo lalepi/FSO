@@ -57,10 +57,8 @@ const toggleLike = id => {
   blogService
   .update(id,changedBlog)
   .then(returnedBlog => {
-    setBlogs.blogs.map(blog => blog.id !== id ? blog : returnedBlog)
+    setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
   })
-
-
 }
 
 const loginForm = () => (
@@ -125,6 +123,37 @@ const logoutUser = () => (
 </div>
 )
 
+
+  const blogForm = () => (
+    <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
+      <BlogForm createBlog={addBlog}/>
+    </Togglable>
+      )
+
+
+ 
+
+  const allBlogs = () => {
+
+    const sortedBlogs = blogs.sort((a, b) => {
+      if (a.likes < b.likes) return 1;
+      if (a.likes > b.likes) return -1;
+      return 0;
+    })
+
+    return (
+      <div>
+        {sortedBlogs.map(blog =>
+          <Blog
+            key={blog.id}
+            blog={blog}
+            toggleLike={() => toggleLike(blog.id)}
+          />
+        )}
+      </div>
+    )
+  }
+
   if (user === null) {
     return (
       <div>
@@ -135,24 +164,6 @@ const logoutUser = () => (
       </div>
     )
   }
-
-  const blogForm = () => (
-    <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
-      <BlogForm createBlog={addBlog}/>
-    </Togglable>
-      )
-
-  const allBlogs = () => (
-    <div>
-      {blogs.map(blog =>
-        <Blog 
-        key={blog.id} 
-        blog={blog}
-        toggleLike={() => toggleLike(blog.id)}
-        />
-      )}
-    </div>
-  )
 
   return (
     <div>
