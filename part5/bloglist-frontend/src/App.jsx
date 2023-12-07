@@ -120,18 +120,28 @@ const logoutUser = () => (
 {user && <div>
   <p>{user.name} logged in <button onClick={handleLogout}>Logout</button></p>
   </div>}
-</div>
-)
-
+    </div>
+  )
 
   const blogForm = () => (
-    <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
+    <Togglable buttonLabel="Create new blog" buttonLabelBack="cancel" ref={blogFormRef}>
       <BlogForm createBlog={addBlog}/>
     </Togglable>
-      )
+  )
 
+  const removeBlog = id => {
+    const blog = blogs.find(n => n.id === id)
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`) === true)
 
- 
+      blogService
+        .remove(id)
+        .then(
+          setBlogs(
+            blogs.filter((blog) => {return blog.id !== id })),
+          setMessage(`Blog '${blog.title} by ${blog.author}' has been removed`),
+          setTimeout(() => { setMessage(null) }, 5000)
+        )
+  }
 
   const allBlogs = () => {
 
@@ -147,7 +157,9 @@ const logoutUser = () => (
           <Blog
             key={blog.id}
             blog={blog}
+            user={user.username}
             toggleLike={() => toggleLike(blog.id)}
+            removeBlog={() => removeBlog(blog.id)}
           />
         )}
       </div>
@@ -173,6 +185,7 @@ const logoutUser = () => (
       {logoutUser()}
       {blogForm()}
       {allBlogs()}
+      
     
     </div>
   )

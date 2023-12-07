@@ -14,6 +14,12 @@ const Notification = ({ message }) => {
         {message}
       </div>
     )
+    if (message.includes('removed'))
+      return (
+      <div className="delete">
+        {message}
+      </div>
+    )
   }
 
 
