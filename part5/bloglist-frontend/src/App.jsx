@@ -20,7 +20,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -33,93 +33,93 @@ const App = () => {
   }, [])
 
 
-const addBlog = (blogObject) => {
-  blogFormRef.current.toggleVisibility()
+  const addBlog = (blogObject) => {
+    blogFormRef.current.toggleVisibility()
 
-  blogService
-    .create(blogObject)
-    .then(returnedBlog => {
-      setBlogs(blogs.concat(returnedBlog))
-      setMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
-      setTimeout(() => {
-        setMessage(null)
-      }, 5000)
-    })
+    blogService
+      .create(blogObject)
+      .then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+        setMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+      })
 
-}
-
-const toggleLike = id => {
-
-  const blog = blogs.find(n => n.id === id)
-  const like = blog.likes + 1
-  const changedBlog = { ...blog, likes: like }
-
-  blogService
-  .update(id,changedBlog)
-  .then(returnedBlog => {
-    setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
-  })
-}
-
-const loginForm = () => (
-  <form onSubmit={handleLogin}>
-    <div>
-      username
-      <input
-        type="text"
-        value={username}
-        name="Username"
-        onChange={({ target }) => setUsername(target.value)}
-      />
-    </div>
-    <div>
-      password
-      <input
-        type="password"
-        value={password}
-        name="Password"
-        onChange={({ target }) => setPassword(target.value)}
-      />
-    </div>
-    <button type="submit">login</button>
-  </form>
-)
-
-
-const handleLogin = async (event) => {
-  event.preventDefault()
-  try {
-    const user = await loginService.login({
-      username, password,
-    })
-
-    window.localStorage.setItem(
-      'loggedBlogUser', JSON.stringify(user)
-    )
-
-    blogService.setToken(user.token)
-    setUser(user)
-    setUsername('')
-    setPassword('')
-  } catch (exception) {
-    setErrorMessage('wrong username or password')
-    setTimeout(() => {
-      setErrorMessage(null)
-    }, 5000)
   }
-}
 
-const handleLogout = async (event) => {
-event.preventDefault()
-window.localStorage.removeItem('loggedBlogUser')
-window.location.reload();
-}
+  const toggleLike = id => {
 
-const logoutUser = () => (
-<div>
-{user && <div>
-  <p>{user.name} logged in <button onClick={handleLogout}>Logout</button></p>
-  </div>}
+    const blog = blogs.find(n => n.id === id)
+    const like = blog.likes + 1
+    const changedBlog = { ...blog, likes: like }
+
+    blogService
+      .update(id,changedBlog)
+      .then(returnedBlog => {
+        setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+      })
+  }
+
+  const loginForm = () => (
+    <form onSubmit={handleLogin}>
+      <div>
+      username
+        <input
+          type="text"
+          value={username}
+          name="Username"
+          onChange={({ target }) => setUsername(target.value)}
+        />
+      </div>
+      <div>
+      password
+        <input
+          type="password"
+          value={password}
+          name="Password"
+          onChange={({ target }) => setPassword(target.value)}
+        />
+      </div>
+      <button type="submit">login</button>
+    </form>
+  )
+
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    try {
+      const user = await loginService.login({
+        username, password,
+      })
+
+      window.localStorage.setItem(
+        'loggedBlogUser', JSON.stringify(user)
+      )
+
+      blogService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+    } catch (exception) {
+      setErrorMessage('wrong username or password')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const handleLogout = async (event) => {
+    event.preventDefault()
+    window.localStorage.removeItem('loggedBlogUser')
+    window.location.reload()
+  }
+
+  const logoutUser = () => (
+    <div>
+      {user && <div>
+        <p>{user.name} logged in <button onClick={handleLogout}>Logout</button></p>
+      </div>}
     </div>
   )
 
@@ -146,9 +146,9 @@ const logoutUser = () => (
   const allBlogs = () => {
 
     const sortedBlogs = blogs.sort((a, b) => {
-      if (a.likes < b.likes) return 1;
-      if (a.likes > b.likes) return -1;
-      return 0;
+      if (a.likes < b.likes) return 1
+      if (a.likes > b.likes) return -1
+      return 0
     })
 
     return (
@@ -179,14 +179,14 @@ const logoutUser = () => (
 
   return (
     <div>
-      
+
       <h2>blogs</h2>
       <Notification message={message}/>
       {logoutUser()}
       {blogForm()}
       {allBlogs()}
-      
-    
+
+
     </div>
   )
 }

@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 
 
-const Blog = ({ blog, user, toggleLike, removeBlog}) => {
+const Blog = ({ blog, user, toggleLike, removeBlog }) => {
 
   const [loggedUser, setLoggedUser] = useState(null)
   const [blogVisible, setBlogVisible] = useState(false)
-  
+
   const hideWhenVisible = { display: blogVisible ? 'none' : '' }
   const showWhenVisible = { display: blogVisible ? '' : 'none' }
-  const allowRemove = {display: loggedUser === blog.user.username ? '' : 'none'}
+  const allowRemove = { display: loggedUser === blog.user.username ? '' : 'none' }
 
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const Blog = ({ blog, user, toggleLike, removeBlog}) => {
       </div>
     </div>
   )
- 
+
 }
 
 export default Blog
