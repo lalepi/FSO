@@ -3,12 +3,18 @@ import { useState, useEffect } from 'react'
 
 const Blog = ({ blog, user, toggleLike, removeBlog }) => {
 
+
   const [loggedUser, setLoggedUser] = useState(null)
   const [blogVisible, setBlogVisible] = useState(false)
 
   const hideWhenVisible = { display: blogVisible ? 'none' : '' }
   const showWhenVisible = { display: blogVisible ? '' : 'none' }
-  const allowRemove = { display: loggedUser === blog.user.username ? '' : 'none' }
+  const allowRemove = { display: loggedUser === user ? '' : 'none' }
+
+  const toggleVisibility = () => {
+    setBlogVisible(!blogVisible)
+
+  }
 
 
   useEffect(() => {
@@ -28,16 +34,18 @@ const Blog = ({ blog, user, toggleLike, removeBlog }) => {
   }
 
   return (
-    <div style={blogStyle}>
+
+    <div style={blogStyle} className='blog'>
+
       <div style={hideWhenVisible}>
         {blog.title} {blog.author}
-        <button onClick={() => setBlogVisible(true)}>view</button>
+        <button onClick={toggleVisibility}>view</button>
       </div>
 
-      <div style={showWhenVisible}>
+      <div style={showWhenVisible} className='blogVis'>
         <div>
           Blog: {blog.title} {blog.author}
-          <button onClick={() => setBlogVisible(false)}>hide</button>
+          <button onClick={toggleVisibility}>hide</button>
         </div>
         <div>
           URL: {blog.url}
@@ -48,11 +56,12 @@ const Blog = ({ blog, user, toggleLike, removeBlog }) => {
         <div>
           User: {user}
         </div>
-        <div style = {allowRemove}>
+        <div style={allowRemove}>
           <button onClick={() => removeBlog(blog.id)}>Remove</button>
         </div>
       </div>
     </div>
+
   )
 
 }
