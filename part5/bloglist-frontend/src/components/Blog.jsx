@@ -57,7 +57,7 @@ const Blog = ({ blog, user, toggleLike, removeBlog }) => {
           User: {user}
         </div>
         <div style={allowRemove}>
-          <button onClick={() => removeBlog(blog.id)}>Remove</button>
+          <button id='remove-button' onClick={() => removeBlog(blog.id)}>Remove</button>
         </div>
       </div>
     </div>
