@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 
-
 const Blog = ({ blog, user, toggleLike, removeBlog }) => {
 
 
@@ -9,7 +8,7 @@ const Blog = ({ blog, user, toggleLike, removeBlog }) => {
 
   const hideWhenVisible = { display: blogVisible ? 'none' : '' }
   const showWhenVisible = { display: blogVisible ? '' : 'none' }
-  const allowRemove = { display: loggedUser === user ? '' : 'none' }
+  const allowRemove = { display: loggedUser === blog.user.username ? '' : 'none' }
 
   const toggleVisibility = () => {
     setBlogVisible(!blogVisible)
@@ -54,7 +53,7 @@ const Blog = ({ blog, user, toggleLike, removeBlog }) => {
           Likes: {blog.likes} <button onClick={toggleLike}>Like</button>
         </div>
         <div>
-          User: {user}
+          User: {blog.user.username}
         </div>
         <div style={allowRemove}>
           <button id='remove-button' onClick={() => removeBlog(blog.id)}>Remove</button>

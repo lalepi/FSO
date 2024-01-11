@@ -7,9 +7,18 @@ describe('Blog app', function() {
       username: 'mluukkai',
       password: 'salainen'
     }
-    cy.visit('')
 
     cy.request('POST', `${Cypress.env('BACKEND')}/users`, user)
+
+    const user2 = {
+      name: 'mluukkai2',
+      username: 'mluukkai2',
+      password: 'salainen2'
+    }
+    cy.request('POST', `${Cypress.env('BACKEND')}/users`, user2)
+
+    cy.visit('')
+
   })
 
   it('Login form is shown', function() {
@@ -54,14 +63,12 @@ describe('Blog app', function() {
         .and('have.css', 'border-style', 'solid')
 
     })
-
-
     describe('and a blog exists', function () {
       beforeEach(function () {
         cy.createBlog({
           title: 'test title',
           author: 'cypress',
-          url:'cypress url'
+          url:'cypress url',
         })
       })
       it('it can be viewed', function () {
@@ -94,26 +101,86 @@ describe('Blog app', function() {
       })
 
     })
-    describe('only user to remove the blog is the adder', function (){
+
+
+    describe('Blog ownership', function () {
       beforeEach(function () {
+        cy.login({ username: 'mluukkai', password: 'salainen' })
         cy.createBlog({
           title: 'test title',
           author: 'cypress',
           url:'cypress url',
-          likes: 3,
-          user: 'mluukkai2'
+        })
+
+        cy.login({ username: 'mluukkai2', password: 'salainen2' })
+        cy.createBlog({
+          title: 'test title2',
+          author: 'cypress2',
+          url:'cypress url2',
         })
       })
 
-
       it('try to remove blog as different user', function (){
+
         cy.contains('test title cypress')
         cy.contains('view').click()
+        cy.contains('test title cypress')
+          .should('not.contain', 'Remove')
 
+        cy.login({ username: 'mluukkai', password: 'salainen' })
+
+        cy.contains('test title2 cypress2')
+        cy.contains('view').click()
+        cy.contains('test title2 cypress2')
+          .should('not.contain', 'Remove')
+      })
+    })
+
+    it.only('blogs are arranged by likes', function (){
+
+      cy.login({ username: 'mluukkai', password: 'salainen' })
+      cy.createBlog({
+        title: 'Blog number 1',
+        author: 'cypress',
+        url:'cypress url',
+      })
+      cy.createBlog({
+        title: 'Blog number 2',
+        author: 'cypress',
+        url:'cypress url',
+      })
+      cy.createBlog({
+        title: 'Blog number 3',
+        author: 'cypress',
+        url:'cypress url',
       })
 
+      cy.contains('Blog number 1 cypress')
+      cy.contains('view').click()
+      cy.contains('Like').click().click()
+      cy.contains('hide').click()
+
+
+      cy.get('.blog')
+        .eq(1)
+        .within(() => {
+          cy.contains('view').click()
+          cy.contains('Like').click().click().click().click()
+        })
+
+      cy.get('.blog')
+        .eq(2)
+        .within(() => {
+          cy.contains('view').click()
+          cy.contains('Like').click().click().click()
+        })
+
+      cy.get('.blog').eq(0).should('contain', 'Blog number 2' )
+      cy.get('.blog').eq(1).should('contain', 'Blog number 3' )
+      cy.get('.blog').eq(2).should('contain', 'Blog number 1' )
 
     })
 
   })
+
 })

@@ -94,12 +94,12 @@ const App = () => {
       const user = await loginService.login({
         username, password,
       })
-
+      blogService.setToken(user.token)
       window.localStorage.setItem(
         'loggedBlogUser', JSON.stringify(user)
       )
 
-      blogService.setToken(user.token)
+
       setUser(user)
       setUsername('')
       setPassword('')
