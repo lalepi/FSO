@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -37,6 +36,7 @@ createAnecdote(state, action) {
     votes: 0
   })
 },
+
 vote(state, action) {
   const id = action.payload.id
       const anecdoteToChange = state.find(n => n.id === id)
