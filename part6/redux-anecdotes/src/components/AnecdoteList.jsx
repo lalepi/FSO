@@ -33,7 +33,7 @@ console.log('filter', filter)
       const message = (`You voted '${anecdote.content}' `)
       
       dispatch(setNotification(message))
-
+      
       setTimeout(() => {
         dispatch(hideNotification(null))
       
