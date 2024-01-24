@@ -5,11 +5,7 @@ const AnecdoteList = () => {
 
   const anecdotes = useSelector(({filter, anecdotes}) => {
 
-console.log('anecdotes', anecdotes)
-
-console.log('filter', filter)
      if ( filter === 'NONE' ) {
-       console.log('anecdotes', anecdotes)
        return anecdotes
      }
      else {
@@ -29,7 +25,6 @@ console.log('filter', filter)
 
   const handleClick = (anecdote) => {
     dispatch(vote(anecdote))
-    
       const message = (`You voted '${anecdote.content}' `)
       
       dispatch(setNotification(message))
