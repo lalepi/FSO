@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   BrowserRouter as Router,
-  Routes, Route, Link, useMatch,
+  Routes, Route, Link, useMatch, useNavigate,
 } from 'react-router-dom'
 
 
@@ -59,6 +59,8 @@ const CreateNew = (props) => {
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
 
+  const navigate = useNavigate()
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -68,6 +70,7 @@ const CreateNew = (props) => {
       info,
       votes: 0
     })
+    navigate('/')
   }
 
   return (
@@ -86,7 +89,7 @@ const CreateNew = (props) => {
           url for more info
           <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
         </div>
-        <button>create</button>
+        <button type ="submit">create</button>
       </form>
     </div>
   )
@@ -103,6 +106,15 @@ return (
 <br></br>
 </div>
 )
+}
+
+const Notification = ({ message }) => {
+  console.log(message)
+  if (message === null) {
+    return null
+  }
+else return message
+
 }
 
 const App = () => {
@@ -124,10 +136,20 @@ const App = () => {
   ])
 
   const [notification, setNotification] = useState('')
+  const [message, setMessage] = useState('')
 
+  useEffect(() => {
+    if(notification) {
+      setMessage(`A new anecdote ${notification} created!`),
+      setTimeout(() => { setMessage(null) }, 5000)
+    }
+  }, [notification])
+
+  
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
+    setNotification(anecdote.content)
   }
 
   const anecdoteById = (id) =>
@@ -154,6 +176,7 @@ const App = () => {
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
+      <Notification message = {message}/>
     </div>
 
     <Routes>
