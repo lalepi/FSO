@@ -22,7 +22,6 @@ const useCountry = (name) => {
     axios
      .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${name}`)
      .then(response =>{
-      console.log(response)
       setCountry(response)
      })
      .catch(function (error) {
@@ -34,7 +33,6 @@ const useCountry = (name) => {
 }
 
 const Country = ({ country }) => {
-console.log("country", country)
   if (!country) {
     return null
   }
