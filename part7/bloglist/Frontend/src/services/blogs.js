@@ -1,36 +1,32 @@
 import axios from "axios";
+import storage from './storage'
+
 const baseUrl = "/api/blogs";
 
-let token = null;
+const getConfit = () => ({
+  headers : { Authorization: `Bearer ${storage.loadUser().token}` }
+})
 
-const setToken = (newToken) => {
-  token = `Bearer ${newToken}`;
-};
-
-const getAll = () => {
-  const request = axios.get(baseUrl);
-  return request.then((response) => response.data);
-};
+const getAll = async () => {
+  const response = await axios.get(baseUrl)
+  return response.data
+}
 
 const create = async (newObject) => {
-  const config = {
-    headers: { Authorization: token },
-  };
 
-  const request = axios.post(baseUrl, newObject, config);
+  const request = axios.post(baseUrl, newObject, getConfit());
   return request.then((response) => response.data);
 };
 
 const update = (id, newObject) => {
-  const request = axios.put(`${baseUrl}/${id}`, newObject);
+  const request = axios.put(`${baseUrl}/${id}`, newObject, getConfit());
   return request.then((response) => response.data);
 };
 
 const remove = (id) => {
-  const config = {
-    headers: { Authorization: token },
-  };
-  const request = axios.delete(`${baseUrl}/${id}`, config);
+ 
+  const request = axios.delete(`${baseUrl}/${id}`, getConfit());
   return request.then((response) => response.data);
 };
-export default { getAll, setToken, create, update, remove };
+
+export default { getAll, create, update, remove };

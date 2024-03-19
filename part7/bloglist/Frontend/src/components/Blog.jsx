@@ -1,26 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
+import storage from '../services/storage'
 
-const Blog = ({ blog, user, toggleLike, removeBlog }) => {
-  const [loggedUser, setLoggedUser] = useState(null);
+const Blog = ({ blog, toggleLike, removeBlog }) => {
   const [blogVisible, setBlogVisible] = useState(false);
 
   const hideWhenVisible = { display: blogVisible ? "none" : "" };
   const showWhenVisible = { display: blogVisible ? "" : "none" };
-  const allowRemove = {
-    display: loggedUser === blog.user.username ? "" : "none",
-  };
+  const allowRemove =  blog.user ? blog.user.username === storage.me() : true
+  
+  console.log(blog.user, storage.me(), allowRemove)
+  const nameOfUser = blog.user ? blog.user.name : 'anonymous'
+
+  console.log("nameOfUser", nameOfUser)
 
   const toggleVisibility = () => {
     setBlogVisible(!blogVisible);
   };
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogUser");
-    if (loggedUserJSON) {
-      const loggedUser = JSON.parse(loggedUserJSON);
-      setLoggedUser(loggedUser.username);
-    }
-  }, []);
 
   const blogStyle = {
     paddingTop: 10,
@@ -47,11 +42,15 @@ const Blog = ({ blog, user, toggleLike, removeBlog }) => {
           Likes: {blog.likes} <button onClick={toggleLike}>Like</button>
         </div>
         <div>User: {blog.user.username}</div>
-        <div style={allowRemove}>
-          <button id="remove-button" onClick={() => removeBlog(blog.id)}>
+        <div>
+
+        
+        <div>{nameOfUser}</div>
+         {allowRemove && <button id="remove-button" onClick={() => removeBlog(blog.id)}>
             Remove
-          </button>
-        </div>
+          </button>}
+
+          </div>
       </div>
     </div>
   );

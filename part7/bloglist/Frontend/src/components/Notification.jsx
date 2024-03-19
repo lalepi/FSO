@@ -7,7 +7,7 @@ const Notification = () => {
   const [alert, setAlert] = useState({ type: "", message: "" });
   const [show, setShow] = useState(false);
 
-if (notification !== undefined)
+if (notification)
 {
   const delayTime = notification[1] * 1000
   const message = notification[0]
@@ -30,6 +30,12 @@ if (notification !== undefined)
       </div>
     )
   if (alert.includes('a new blog'))
+    return (
+      <div className="add">
+        {alert}
+      </div>
+    )
+    if (alert.includes('welcome'))
     return (
       <div className="add">
         {alert}
