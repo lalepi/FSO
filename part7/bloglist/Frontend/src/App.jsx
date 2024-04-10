@@ -1,165 +1,169 @@
-import { useState, useEffect, React, useRef } from "react";
-import Blog from "./components/Blog";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
-import Notification from "./components/Notification";
-import BlogForm from "./components/BlogForm";
-import Togglable from "./components/Togglable";
-import{ setNotification} from './reducers/notificationReducer'
-import { initializeBlogs, createBlog, setBlogs} from './reducers/blogReducer'
+import { useState, useEffect, React, createRef } from 'react'
+import Blog from './components/Blog'
+import Notification from './components/Notification'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
+import {
+    initializeBlogs,
+    createBlog,
+    voteBlog,
+    removeBlog,
+} from './reducers/blogReducer'
+import { loginCredentials, logoutCredentials } from './reducers/loginReducer'
+import { initializeUsers } from './reducers/userReducer'
 import { useDispatch, useSelector } from 'react-redux'
-
 import storage from './services/storage'
 import Login from './components/Login'
+import Users from './components/Users'
+import SingleUser from './components/SingleUser'
+import SingleBlog from './components/SingleBlog'
+import NavigationMenu from './components/NavigationMenu'
+
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Link,
+    Navigate,
+    useNavigate,
+    useMatch,
+} from 'react-router-dom'
+
+const HomePage = () => (
+    <div>
+        <h2>Super khuul frontpage info</h2>
+    </div>
+)
 
 const App = () => {
-  const [user, setUser] = useState(null);
+    const [user, setUser] = useState(null)
 
-  const blogFormRef = useRef();
+    const blogFormRef = createRef()
 
-  const dispatch = useDispatch()
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+    useEffect(() => {
+        dispatch(initializeBlogs())
+        dispatch(initializeUsers())
+    }, [])
 
-  useEffect(() => {
-     dispatch(initializeBlogs())
-  }, [])
-
-  useEffect(() => {
-    const user = storage.loadUser()
-    if (user) {
-      setUser(user)
+    const currentUser = () => {
+        const user = useSelector((state) => state.login)
+        return user
     }
-  }, [])
 
-const blogs = useSelector(state => state.blogs)
+    useEffect(() => {
+        const user = storage.loadUser()
+        if (user) {
+            setUser(user)
+            // navigate('/blogs')
+        }
+    }, [currentUser()])
 
-  console.log(blogs)
-
-  const addBlog = (blogObject) => {
-    blogFormRef.current.toggleVisibility();
-
-      dispatch(createBlog(blogObject))
-      const message = (`a new blog ${blogObject.title} by ${blogObject.author} added`)
-      const time = 5
-      dispatch(setNotification(message, time))
-  };
-
-  // const toggleLike = (id) => {
-  //   const blog = blogs.find((n) => n.id === id);
-  //   const like = blog.likes + 1;
-  //   const changedBlog = { ...blog, likes: like };
-
-  //   blogService.update(id, changedBlog).then((returnedBlog) => {
-  //     setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)));
-  //   });
-  // };
-
-
-  const handleLogin = async (credentials) => {
-    try {
-      const user = await loginService.login(credentials)
-      setUser(user)
-      storage.saveUser(user)
-      const message = (`welcome ${user.name}`)
-      const time = 5
-      dispatch(setNotification(message, time))
-
-    } catch (error) {
-
-      const message = ("wrong username or password")
-      const time = 5
-      dispatch(setNotification(message, time))
+    const sortBlogs = () => {
+        const blogs = useSelector((state) => state.blogs)
+        const temp = [...blogs]
+        return temp.sort((a, b) => {
+            if (a.likes < b.likes) return 1
+            if (a.likes > b.likes) return -1
+            return 0
+        })
     }
-  };
+    const blogs = sortBlogs()
 
-  const handleLogout = () => {
-    setUser(null)
-    storage.removeUser()
-  };
+    const addBlog = (blogObject) => {
+        blogFormRef.current.toggleVisibility()
+        dispatch(createBlog(blogObject))
+    }
 
-  const logoutUser = () => (
-    <div>
-      {user && (
+    const handleLogin = async (credentials) => {
+        dispatch(loginCredentials(credentials))
+    }
+
+    const handleLogout = () => {
+        dispatch(logoutCredentials())
+        setUser(null)
+    }
+
+    const toggleLike = (blog) => {
+        dispatch(voteBlog(blog))
+    }
+
+    const dismissBlog = (blog) => {
+        dispatch(removeBlog(blog))
+        ////korjaa tämä, ei päivity listaus////
+        navigate(`/users/`)
+    }
+
+    const blogForm = () => (
+        <Togglable
+            buttonLabel="Create new blog"
+            buttonLabelBack="cancel"
+            ref={blogFormRef}
+        >
+            <BlogForm createBlog={addBlog} />
+        </Togglable>
+    )
+
+    const UserData = () => {
+        const data = () => {
+            const userInfo = useSelector((state) => state.users)
+            return userInfo
+        }
+
+        const users = data() ? data() : null
+        return users
+    }
+
+    const allUsers = UserData()
+
+    const match = useMatch('/users/:id')
+    const singleUserData = match
+        ? allUsers.find((user) => user.id === match.params.id)
+        : null
+
+    const blogMatch = useMatch('/blogs/:id')
+    const singleBlogData = blogMatch
+        ? blogs.find((blog) => blog.id === blogMatch.params.id)
+        : null
+
+    return (
         <div>
-          <p>
-            {user.name} logged in <button onClick={handleLogout}>Logout</button>
-          </p>
+            <NavigationMenu
+                user={user}
+                logout={handleLogout}
+                login={handleLogin}
+            />
+
+            <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route
+                    path="/blogs"
+                    element={<Blog blog={blogs} create={blogForm()} />}
+                />
+                <Route
+                    path="/users/*"
+                    element={<Users allUsers={allUsers} />}
+                />
+                <Route
+                    path="/users/:id/*"
+                    element={<SingleUser user={singleUserData} />}
+                />
+                <Route
+                    path="/blogs/:id/*"
+                    element={
+                        <SingleBlog
+                            blog={singleBlogData}
+                            toggleLike={() => toggleLike(singleBlogData)}
+                            removeBlog={() => dismissBlog(singleBlogData)}
+                        />
+                    }
+                />
+            </Routes>
+
+            <Notification />
         </div>
-      )}
-    </div>
-  );
+    )
+}
 
-  const blogForm = () => (
-    <Togglable
-      buttonLabel="Create new blog"
-      buttonLabelBack="cancel"
-      ref={blogFormRef}
-    >
-      <BlogForm createBlog={addBlog} />
-    </Togglable>
-  );
-
-  const removeBlog = (id) => {
-    const blog = blogs.find((n) => n.id === id);
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`) === true)
-      blogService.remove(id).then(
-        setBlogs(
-          blogs.filter((blog) => {
-            return blog.id !== id;
-          })));
-      const message = (`Blog '${blog.title} by ${blog.author}' has been removed`)
-      const time = 5
-      dispatch(setNotification(message, time))
-  };
-
-
-
-  const byLikes = (a, b) => b.likes - a.likes
-
-  const allBlogs = () => {
-
-    console.log("blogs", blogs)
-    // const sortedBlogs = blogs.sort((a, b) => {
-    //   if (a.likes < b.likes) return 1;
-    //   if (a.likes > b.likes) return -1;
-    //   return 0;
-    //const sortedBlogs = blogs.sort((a, b) => { b.likes - a.likes } )
-    //const byLikes = (a, b) => b.likes - a.likes
-
-   const sortedBlogs = blogs
-    
-    return (
-      <div>
-        {sortedBlogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            toggleLike={() => toggleLike(blog.id)}
-            removeBlog={() => removeBlog(blog.id)}
-          />
-        ))}
-      </div>
-    );
-  };
-
-  if (!user) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification/>
-        <Login doLogin={handleLogin} />
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <h2>blogs</h2>
-      <Notification/>
-      {logoutUser()}
-      {blogForm()}
-      {allBlogs()}
-    </div>
-  );
-};
-
-export default App;
+export default App

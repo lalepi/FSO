@@ -13,20 +13,18 @@ const getAll = async () => {
 }
 
 const create = async (newObject) => {
-
-  const request = axios.post(baseUrl, newObject, getConfit());
-  return request.then((response) => response.data);
+  const request = await axios.post(baseUrl, newObject, getConfit());
+  return request.data
 };
 
-const update = (id, newObject) => {
-  const request = axios.put(`${baseUrl}/${id}`, newObject, getConfit());
-  return request.then((response) => response.data);
+const update = async (likedBlog) => {
+  const request = await axios.put(`${baseUrl}/${likedBlog.id}`, likedBlog, getConfit());
+ return request.data
 };
 
-const remove = (id) => {
- 
-  const request = axios.delete(`${baseUrl}/${id}`, getConfit());
-  return request.then((response) => response.data);
+const remove = async (blog) => {
+  const request = await axios.delete(`${baseUrl}/${blog.id}`, getConfit());
+  return request.data
 };
 
 export default { getAll, create, update, remove };

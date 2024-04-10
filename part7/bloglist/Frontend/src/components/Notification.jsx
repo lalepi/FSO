@@ -29,21 +29,21 @@ if (notification)
         {alert}
       </div>
     )
-  if (alert.includes('a new blog'))
+  if (alert.includes('blog info missing'))
     return (
-      <div className="add">
+      <div className="error">
         {alert}
       </div>
-    )
-    if (alert.includes('welcome'))
-    return (
-      <div className="add">
-        {alert}
-      </div>
-    )
+  )
   if (alert.includes('removed'))
     return (
       <div className="delete">
+        {alert}
+      </div>
+    )
+    
+    else return (
+      <div className="add">
         {alert}
       </div>
     )

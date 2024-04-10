@@ -1,7 +1,9 @@
+import {useSelector} from 'react-redux'
+
 const KEY = 'blogUserKey'
 
 const saveUser = (user) => {
-  localStorage.setItem(KEY, JSON.stringify(user))
+ localStorage.setItem(KEY, JSON.stringify(user))
 }
 
 const loadUser = () => {

@@ -1,59 +1,44 @@
-import { useState} from "react";
-import storage from '../services/storage'
+import PropTypes from 'prop-types'
+import { BrowserRouter as Router, Link } from 'react-router-dom'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow,
+    TableHead,
+    Box,
+    Typography,
+} from '@mui/material'
 
-const Blog = ({ blog, toggleLike, removeBlog }) => {
-  const [blogVisible, setBlogVisible] = useState(false);
+const Blog = ({ blog, create }) => {
+    blog.map((blog) => <Blog key={blog.id} blog={blog} />)
 
-  const hideWhenVisible = { display: blogVisible ? "none" : "" };
-  const showWhenVisible = { display: blogVisible ? "" : "none" };
-  const allowRemove =  blog.user ? blog.user.username === storage.me() : true
-  
-  console.log(blog.user, storage.me(), allowRemove)
-  const nameOfUser = blog.user ? blog.user.name : 'anonymous'
+    return (
+        <Table size="small">
+            <TableHead>
+                <TableRow>
+                    <TableCell>{create}</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                <TableRow>
+                    <TableCell>
+                        {blog.map((blog) => {
+                            return (
+                                <div key={blog.id}>
+                                    <Link to={`/blogs/${blog.id}`}>
+                                        {blog.title}
+                                        {blog.author}
+                                    </Link>
+                                </div>
+                            )
+                        })}
+                    </TableCell>
+                </TableRow>
+            </TableBody>
+        </Table>
+    )
+}
 
-  console.log("nameOfUser", nameOfUser)
-
-  const toggleVisibility = () => {
-    setBlogVisible(!blogVisible);
-  };
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  return (
-    <div style={blogStyle} className="blog">
-      <div style={hideWhenVisible}>
-        {blog.title} {blog.author}
-        <button onClick={toggleVisibility}>view</button>
-      </div>
-
-      <div style={showWhenVisible} className="blogContent">
-        <div>
-          Blog: {blog.title} {blog.author}
-          <button onClick={toggleVisibility}>hide</button>
-        </div>
-        <div>URL: {blog.url}</div>
-        <div>
-          Likes: {blog.likes} <button onClick={toggleLike}>Like</button>
-        </div>
-        <div>User: {blog.user.username}</div>
-        <div>
-
-        
-        <div>{nameOfUser}</div>
-         {allowRemove && <button id="remove-button" onClick={() => removeBlog(blog.id)}>
-            Remove
-          </button>}
-
-          </div>
-      </div>
-    </div>
-  );
-};
-
-export default Blog;
+export default Blog
