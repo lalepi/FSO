@@ -1,22 +1,22 @@
 import { useState } from 'react'
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Link,
-    Navigate,
-    useNavigate,
-    useMatch,
-} from 'react-router-dom'
-import { Typography, Button } from '@mui/material'
+import { useDispatch } from 'react-redux'
 
-const Login = ({ doLogin }) => {
+import { loginCredentials } from '../reducers/loginReducer'
+
+import { Typography, Button } from '@mui/material'
+import Input from '@mui/material/Input'
+const Login = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const dispatch = useDispatch()
+
+    const Login = async (credentials) => {
+        dispatch(loginCredentials(credentials))
+    }
 
     const handleLogin = (event) => {
         event.preventDefault()
-        doLogin({ username, password })
+        Login({ username, password })
         setUsername('')
         setPassword('')
     }
@@ -24,25 +24,23 @@ const Login = ({ doLogin }) => {
     return (
         <form onSubmit={handleLogin}>
             <Typography component="div">
-                <label>
-                    Username:
-                    <input
-                        type="text"
-                        data-testid="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                </label>
-
-                <label>
-                    Password:
-                    <input
-                        type="password"
-                        value={password}
-                        data-testid="password"
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                </label>
+                Sign In
+                <Input
+                    sx={{ marginRight: '10px', marginLeft: '10px' }}
+                    placeholder=" username"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <Input
+                    sx={{ marginRight: '10px' }}
+                    placeholder=" password"
+                    required
+                    type="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
                 <Button color="inherit" type="submit">
                     Login
                 </Button>

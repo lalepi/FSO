@@ -1,3 +1,6 @@
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+
 import {
     Table,
     TableBody,
@@ -6,17 +9,10 @@ import {
     TableRow,
     TableHead,
 } from '@mui/material'
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Link,
-    Navigate,
-    useNavigate,
-    useMatch,
-} from 'react-router-dom'
 
-const Users = ({ allUsers }) => {
+const Users = () => {
+    const users = useSelector((state) => state.users)
+
     return (
         <div>
             <TableContainer>
@@ -36,7 +32,7 @@ const Users = ({ allUsers }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {Object.entries(allUsers).map(([key, val], i) => {
+                        {Object.entries(users).map(([key, val], i) => {
                             return (
                                 <TableRow key={val.id}>
                                     <TableCell>

@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs'
 import { setNotification } from './notificationReducer'
-
+import { initializeUsers } from '../reducers/userReducer'
 const blogSlice = createSlice({
     name: 'blogs',
     initialState: [],
@@ -18,20 +18,16 @@ const blogSlice = createSlice({
         setBlogs(state, action) {
             return action.payload
         },
-
         updateList(state, action) {
-            console.log('action.payload', action.payload)
             const id = action.payload.id
-            const blogs = state.filter((blog) => {
-                return blog.id !== id
+            return state.filter((blog) => {
+                blog.id !== id
             })
-            console.log(blogs)
-            return blogs
         },
     },
 })
 
-export const { appendBlog, setBlogs, updateVote, updateList } =
+export const { appendBlog, setBlogs, updateVote, updateList, addComment } =
     blogSlice.actions
 
 export const initializeBlogs = () => {
@@ -47,7 +43,7 @@ export const createBlog = (content) => {
             const newBlog = await blogService.create(content)
             dispatch(appendBlog(newBlog))
             dispatch(initializeBlogs())
-
+            dispatch(initializeUsers())
             const message = `a new blog ${newBlog.title} by ${newBlog.author} added`
             const time = 5
             dispatch(setNotification(message, time))
@@ -76,19 +72,32 @@ export const voteBlog = (content) => {
     }
 }
 
-export const removeBlog = (content) => {
-    console.log('content', { ...content })
-    const blog = { ...content }
+export const removeBlog = (blog) => {
     return async (dispatch) => {
         try {
             await blogService.remove(blog)
             dispatch(updateList(blog))
+            dispatch(initializeBlogs())
+            dispatch(initializeUsers())
             const message = `Blog '${blog.title} by ${blog.author}' has been removed`
             const time = 5
             dispatch(setNotification(message, time))
         } catch (error) {
             const message = `cant remove, errormessage '${error.message}' `
             const time = 10
+            dispatch(setNotification(message, time))
+        }
+    }
+}
+
+export const createComment = (comment) => {
+    return async (dispatch) => {
+        try {
+            await blogService.comment(comment)
+            dispatch(initializeBlogs())
+        } catch (error) {
+            const message = error.response.data.error
+            const time = 5
             dispatch(setNotification(message, time))
         }
     }

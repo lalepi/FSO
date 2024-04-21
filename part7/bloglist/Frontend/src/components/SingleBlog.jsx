@@ -1,75 +1,100 @@
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useMatch } from 'react-router-dom'
+
 import storage from '../services/storage'
 
+import { voteBlog, removeBlog } from '../reducers/blogReducer'
+
+import CommentBlog from '../components/Comments'
 import {
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableRow,
-    TableHead,
-    Box,
     Typography,
+    Button,
 } from '@mui/material'
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Link,
-    Navigate,
-    useNavigate,
-    useMatch,
-} from 'react-router-dom'
 
-const SingleBlog = ({ blog, toggleLike, removeBlog }) => {
+const SingleBlog = () => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
-    const allowRemove = blog.user ? blog.user.username === storage.me() : true
-    const nameOfUser = blog.user ? blog.user.name : 'anonymous'
+    const blogs = useSelector((state) => state.blogs)
 
-    if (!blog) {
+    const blogMatch = useMatch('/blogs/:id')
+    const blogData = blogMatch
+        ? blogs.find((blog) => blog.id === blogMatch.params.id)
+        : null
+
+    if (!blogData) {
         return null
+    }
+
+    const allowRemove = blogData.user
+        ? blogData.user.username === storage.me()
+        : true
+    const nameOfUser = blogData.user ? blogData.user.name : 'anonymous'
+
+    const toggleLike = (blog) => {
+        dispatch(voteBlog(blog))
+    }
+
+    const dismissBlog = (blog) => {
+        dispatch(removeBlog(blog))
+        navigate(-1)
     }
 
     return (
         <TableContainer>
+            <Typography
+                variant="h6"
+                component="div"
+                width="100%"
+                paddingLeft="15px"
+                paddingTop="20px"
+            >
+                Single Blog
+            </Typography>
             <Table
-                sx={{ maxWidth: 600 }}
+                sx={{ maxWidth: 300 }}
                 aria-label="simple table"
                 size="small"
             >
-                <TableHead>
-                    <TableRow>
-                        <TableCell>SingleBlog</TableCell>
-                    </TableRow>
-                </TableHead>
                 <TableBody>
                     <TableRow>
                         <TableCell>Blog</TableCell>
                         <TableCell>
-                            {blog.title} {blog.author}
+                            {blogData.title} {blogData.author}
                         </TableCell>
+                        <TableCell></TableCell>
                     </TableRow>
-
                     <TableRow>
                         <TableCell>URL</TableCell>
                         <TableCell>
                             <a
-                                href={`https://${blog.url}`}
+                                href={`https://${blogData.url}`}
                                 target="_blank"
                                 rel="noopener"
                             >
-                                {blog.url}
+                                {blogData.url}
                             </a>
                         </TableCell>
+                        <TableCell></TableCell>
                     </TableRow>
 
                     <TableRow>
                         <TableCell>Likes</TableCell>
-                        <TableCell>{blog.likes}</TableCell>
+                        <TableCell>{blogData.likes}</TableCell>
                         <TableCell>
-                            <button onClick={() => toggleLike(blog)}>
+                            <Button
+                                variant="contained"
+                                size="small"
+                                color="success"
+                                onClick={() => toggleLike(blogData)}
+                            >
                                 Like
-                            </button>
+                            </Button>
                         </TableCell>
                     </TableRow>
 
@@ -78,17 +103,21 @@ const SingleBlog = ({ blog, toggleLike, removeBlog }) => {
                         <TableCell>{nameOfUser}</TableCell>
                         <TableCell>
                             {allowRemove && (
-                                <button
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    color="error"
                                     id="remove-button"
-                                    onClick={() => removeBlog(blog)}
+                                    onClick={() => dismissBlog(blogData)}
                                 >
                                     Remove
-                                </button>
+                                </Button>
                             )}
                         </TableCell>
                     </TableRow>
                 </TableBody>
             </Table>
+            <CommentBlog blog={blogData} />
         </TableContainer>
     )
 }

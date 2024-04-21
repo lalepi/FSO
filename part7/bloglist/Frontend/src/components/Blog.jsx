@@ -1,43 +1,67 @@
-import PropTypes from 'prop-types'
-import { BrowserRouter as Router, Link } from 'react-router-dom'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableRow,
-    TableHead,
-    Box,
-    Typography,
-} from '@mui/material'
+import { React, createRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 
-const Blog = ({ blog, create }) => {
-    blog.map((blog) => <Blog key={blog.id} blog={blog} />)
+import BlogForm from '../components/BlogForm'
+import Togglable from '../components/Togglable'
+
+import { createBlog } from '../reducers/blogReducer'
+
+import { Typography } from '@mui/material'
+
+const Blog = () => {
+    const blogFormRef = createRef()
+    const dispatch = useDispatch()
+
+    const addBlog = (blogObject) => {
+        blogFormRef.current.toggleVisibility()
+        dispatch(createBlog(blogObject))
+    }
+
+    const sortBlogs = () => {
+        const blogs = useSelector((state) => state.blogs)
+        const temp = [...blogs]
+        return temp.sort((a, b) => {
+            if (a.likes < b.likes) return 1
+            if (a.likes > b.likes) return -1
+            return 0
+        })
+    }
+    const blogForm = () => (
+        <div>
+            <Togglable
+                buttonLabel="Create new blog"
+                buttonLabelBack="cancel"
+                ref={blogFormRef}
+            >
+                <BlogForm createBlog={addBlog} />
+            </Togglable>
+        </div>
+    )
 
     return (
-        <Table size="small">
-            <TableHead>
-                <TableRow>
-                    <TableCell>{create}</TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                <TableRow>
-                    <TableCell>
-                        {blog.map((blog) => {
-                            return (
-                                <div key={blog.id}>
-                                    <Link to={`/blogs/${blog.id}`}>
-                                        {blog.title}
-                                        {blog.author}
-                                    </Link>
-                                </div>
-                            )
-                        })}
-                    </TableCell>
-                </TableRow>
-            </TableBody>
-        </Table>
+        <div>
+            <Typography component="div" paddingLeft="15px" paddingTop="20px">
+                {blogForm()}
+            </Typography>
+
+            <Typography variant="h6" paddingLeft="15px" paddingTop="20px">
+                Blogs
+            </Typography>
+
+            <Typography component="div" paddingLeft="15px" paddingTop="20px">
+                {sortBlogs().map((blog) => {
+                    return (
+                        <div key={blog.id}>
+                            <Link to={`/blogs/${blog.id}`}>
+                                {blog.title}
+                                {blog.author}
+                            </Link>
+                        </div>
+                    )
+                })}
+            </Typography>
+        </div>
     )
 }
 

@@ -27,4 +27,9 @@ const remove = async (blog) => {
   return request.data
 };
 
-export default { getAll, create, update, remove };
+const comment = async (content) => {
+  const request = await axios.post(`${baseUrl}/${content.blog.id}/comments`, content, getConfit());
+  return request.data
+};
+
+export default { getAll, create, update, remove, comment};

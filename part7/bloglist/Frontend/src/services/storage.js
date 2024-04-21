@@ -1,5 +1,3 @@
-import {useSelector} from 'react-redux'
-
 const KEY = 'blogUserKey'
 
 const saveUser = (user) => {
