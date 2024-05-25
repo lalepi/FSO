@@ -1,73 +1,56 @@
 
-interface HeaderProps {
-  name: string;
-}
-
-interface CoursePart {
-  name: string;
-  exerciseCount: number;
-}
-
-type Courses = CoursePart []
-
-const Header = (props: HeaderProps) => {
-const header = props.name
-  return(
-    <div>
-<h1>{header}</h1>
-    </div>
-  )
-}
-
-const Content = (props: Courses) => {
-  const courseParts = Object.values(props)
-    
-    return (
-        <div>
-        {courseParts.map((course) => 
-              <p key = {course.name}>
-              {course.name} {course.exerciseCount}
-              </p>
-        )}
-        </div>
-)}
-
-const Total = (props: Courses) => {
-  
-  const parts = Object.values(props)
-  const totalExercises = parts.reduce((sum, part) => sum + part.exerciseCount, 0);
-
-return(
-<div>
-    <p>
-    Number of exercises {totalExercises}
-    </p>
-</div>
-)
-
-}
+import {CoursePart} from "./types";
+import Header  from "../components/Header";
+import Total from "../components/Total";
+import Content from "../components/Content";
 
 const App = () => {
   const courseName = "Half Stack application development";
   const courseParts: CoursePart[] = [
     {
       name: "Fundamentals",
-      exerciseCount: 10
+      exerciseCount: 10,
+      description: "This is an awesome course part",
+      kind: "basic"
     },
     {
       name: "Using props to pass data",
-      exerciseCount: 7
+      exerciseCount: 7,
+      groupProjectCount: 3,
+      kind: "group"
+    },
+    {
+      name: "Basics of type Narrowing",
+      exerciseCount: 7,
+      description: "How to go from unknown to string",
+      kind: "basic"
     },
     {
       name: "Deeper type usage",
-      exerciseCount: 14
+      exerciseCount: 14,
+      description: "Confusing description",
+      backgroundMaterial: "https://type-level-typescript.com/template-literal-types",
+      kind: "background"
+    },
+    {
+      name: "TypeScript in frontend",
+      exerciseCount: 10,
+      description: "a hard part",
+      kind: "basic",
+    },
+    {
+      name: "Backend development",
+      exerciseCount: 21,
+      description: "Typing the backend",
+      requirements: ["nodejs", "jest"],
+      kind: "special"
     }
   ];
 
   return (
     <div>
       <Header name={courseName} />
-      <Content {...courseParts} />
+      <Content courses={courseParts} />
       <Total {...courseParts} />
     </div>
   );
