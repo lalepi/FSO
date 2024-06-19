@@ -9,15 +9,4 @@ export const getAllDiaries = () => {
 
 export const createDiary = (object: NewDiary) => {
   return axios.post<Diary>(baseUrl, object).then((response) => response.data);
-
-  // .catch((error) => {
-  //   if (axios.isAxiosError<ValidationError, Record<string, unknown>>(error)) {
-  //     console.log("error.status", error.status);
-  //     console.error("error.response", error.response.data);
-
-  //     error.response;
-  //   }
-  // });
-
-  // Do something with the response
 };

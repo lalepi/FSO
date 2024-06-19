@@ -1,4 +1,3 @@
-import React from "react";
 import { NotificationMessage } from "../types";
 
 const Notification = ({ message }: NotificationMessage) => {

@@ -1,3 +1,4 @@
+import { InputHTMLAttributes } from "react";
 export interface Diary {
   id: number;
   date: string;
@@ -37,8 +38,6 @@ export type NewDiary = Omit<Diary, "id">;
 export interface NotificationMessage {
   message: string;
 }
-
-import { InputHTMLAttributes } from "react";
 
 export interface InputElementProps
   extends InputHTMLAttributes<HTMLInputElement> {
